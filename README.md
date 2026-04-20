@@ -208,6 +208,62 @@ first-class deliverable, not a wrapper.
 - **Batch retrieval** — fetch multiple passages in one call instead of N sequential requests
 - **Pagination** — bounded responses by default
 
+## Development
+
+The project is designed so the full system can be exercised end-to-end in a
+local container environment at any time — not necessarily on every push, but
+on demand. A fast tier of tests runs without containers so that tight
+write-test-iterate loops stay snappy. Tooling is chosen to make AI coding
+agents productive with high autonomy, and humans comfortable too.
+
+### Stack
+
+| Layer | Tool | Why |
+|-------|------|-----|
+| Package / env / Python manager | [`uv`](https://docs.astral.sh/uv/) | Fast, deterministic lockfile; replaces pip, poetry, virtualenv, pyenv |
+| Lint + format | [`ruff`](https://docs.astral.sh/ruff/) | One tool, millisecond feedback, configured in `pyproject.toml` |
+| Type checker | [`pyright`](https://microsoft.github.io/pyright/) | Fast, strict mode, readable errors |
+| Test runner | [`pytest`](https://pytest.org/) | Universal |
+| Task runner | [`just`](https://just.systems/) | Language-agnostic; recipes shared across bahai-api and Immerse Library |
+| API framework | [`FastAPI`](https://fastapi.tiangolo.com/) + [`pydantic`](https://docs.pydantic.dev/) | Auto-generates OpenAPI from type hints |
+| Scraper | [`httpx`](https://www.python-httpx.org/) + [`vcrpy`](https://vcrpy.readthedocs.io/) | Async HTTP, recorded cassettes for tests |
+| Datastore | SQLite + FTS5 | Embedded, fast, no extra container in dev |
+
+Configuration lives in `pyproject.toml` alongside a `justfile` and
+`compose.yml`. Pre-commit hooks are deliberately avoided — `just check` runs
+lint + format + typecheck explicitly. Migrations are hand-written numbered
+SQL files rather than Alembic until schema complexity warrants otherwise.
+
+### Local Stack
+
+A `compose.yml` brings up the API against a committed fixture database. The
+[Immerse Library](https://immerselibrary.org) repo references the same
+compose setup (or a tagged image) for its own e2e tests, so there is a
+single source of truth for how the API is run locally.
+
+### Test Tiers
+
+| Tier | Scope | Runtime | When |
+|------|-------|---------|------|
+| **unit** | pure logic, no I/O | ms | every push |
+| **integration** | API process + SQLite against fixture DB, no containers | seconds | every push |
+| **e2e** | full compose stack + Playwright (once the PWA lands) | tens of seconds | on demand |
+
+- `just test` — unit + integration
+- `just e2e` — full compose stack
+- `just check` — lint + format + typecheck
+
+### Test Data
+
+Fixtures are **real scraped passages**, not mock data — a small, stable
+slice of the corpus committed to the repo so tests reflect real content
+shape and edge cases without hitting bahai.org. The scraper itself is tested
+against recorded HTTP cassettes.
+
+The goal is a fast, deterministic, offline TDD loop that AI coding agents
+can drive on their own. LLM-output evals are planned but out of scope for
+the initial test story.
+
 ## Contributing
 
 Task tracking uses [GitHub Issues](../../issues). Look for issues labeled
