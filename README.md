@@ -3,28 +3,32 @@
 Open-source APIs for accessing, searching, and sharing the Baha'i writings.
 Designed for AI assistants, personal agents, and developers.
 
+> **Status:** planning / design. The endpoints below describe the intended
+> API surface; none of it is implemented yet. Work is tracked in
+> [GitHub Issues](../../issues).
+
 ## Overview
 
-This project provides RESTful APIs for:
-- **Text search** across the Baha'i writings (BM25, semantic/vector, and hybrid retrieval)
+Three capabilities make up the mission:
+
+- **Text search** across the Baha'i writings (BM25, semantic, and hybrid
+  retrieval)
 - **Daily quotes** and subscription-based delivery
 - **Compilations** — user-curated collections of passages to study and share
 
-Primary consumers are AI assistants (coding agents, personal agents, chatbots)
-and developers building Baha'i study tools. The API prioritizes machine
-readability, predictable structure, and context-window efficiency.
+The primary audience is AI assistants and developers building Baha'i study
+tools, so the API is shaped around machine readability, predictable
+structure, and context-window efficiency.
 
 ## API Design
 
 ### Discovery
 
-```
-GET  /api/v1                                # API root — lists endpoints, versions, capabilities
-```
+`GET /api/v1` — API root. Lists endpoints, versions, capabilities.
 
-### Texts & Search — *active*
+### Texts & Search
 
-The foundational layer. Collections align with the
+Collections align with the
 [Baha'i Reference Library](https://www.bahai.org/library/authoritative-texts/)
 hierarchy (Bahaullah, the Bab, Abdul-Baha, Shoghi Effendi, Universal House of
 Justice, Compilations, Prayers).
@@ -36,21 +40,20 @@ GET  /api/v1/texts/{collection}/search?q=   # search within a collection
 GET  /api/v1/search?q=                      # search across all texts
 ```
 
-Common query parameters:
+Common query parameters (apply to most endpoints):
 
-| Parameter | Example | Description |
-|-----------|---------|-------------|
-| `lang`    | `en`    | ISO 639 language code (default: `en`) |
-| `limit`   | `10`    | Max results to return |
-| `offset`  | `0`     | Pagination offset |
-| `fields`  | `id,text,work` | Return only specified fields |
+| Parameter | Notes |
+|-----------|-------|
+| `lang`    | ISO 639 code (default `en`) |
+| `fields`  | Return only named fields, e.g. `id,text,work` |
+| `limit`, `offset` | Standard pagination |
 
-Search-specific parameters:
+Search-specific:
 
-| Parameter | Example | Description |
-|-----------|---------|-------------|
-| `q`       | `pure heart` | Search query |
-| `method`  | `bm25`  | Retrieval method (`bm25`, `semantic`, `hybrid`) |
+| Parameter | Notes |
+|-----------|-------|
+| `q`       | Query string |
+| `method`  | `bm25`, `semantic`, or `hybrid` |
 
 Example search response:
 
@@ -76,10 +79,10 @@ Example search response:
 }
 ```
 
-### Passages — *active*
+### Passages
 
-The atomic citable unit. Each passage links back to one or more canonical
-sources (see [Canonical Links](#canonical-links)).
+The atomic citable unit. Each passage links to one or more canonical sources
+(see [Canonical Links](#canonical-links)).
 
 ```
 GET  /api/v1/passages/{id}                  # a specific passage
@@ -104,14 +107,14 @@ Example response:
 }
 ```
 
-### Subscriptions — *tentative*
+### Subscriptions
 
 ```
 POST /api/v1/subscriptions                  # e.g. "send me a daily quote at 7am"
 GET  /api/v1/subscriptions/{id}
 ```
 
-### Compilations — *tentative*
+### Compilations
 
 ```
 POST /api/v1/compilations                   # create a compilation
@@ -123,142 +126,128 @@ GET  /api/v1/compilations/{id}/passages
 
 ### Works and Translations
 
-A **work** is a language-independent identity (e.g. "Hidden Words, Arabic, #1").
-Each work has one or more **passages**, where each passage is a specific
-translation or the original text. This keeps the default API experience simple
-— most consumers just request a language — while preserving the intrinsic
-relationship between an original and its translations.
+A **work** is a language-independent identity (e.g. "Hidden Words, Arabic,
+#1"). Each work has one or more **passages** — specific translations or the
+original text. Most consumers just request a language; the work/translation
+link is preserved for when it matters.
 
 - `work` — groups passages that are translations of the same source text
-- `lang` — ISO 639 language code (`en`, `ar`, `fa`, `es`, ...)
+- `lang` — ISO 639 code (`en`, `ar`, `fa`, `es`, ...)
 - `translations` — sibling passages in other languages
 
 ### Canonical Links
 
-Passages include links to canonical sources. The primary canonical source is the
-[Baha'i Reference Library](https://www.bahai.org/library/) at bahai.org, which
-provides stable short permalinks (e.g. `https://www.bahai.org/r/070299751`) that
-resolve to the full library path.
+Passages include links to canonical sources. The primary canonical source is
+the [Baha'i Reference Library](https://www.bahai.org/library/), which
+provides stable short permalinks (e.g. `https://www.bahai.org/r/070299751`).
 
 Canonical links live at the passage (translation) level, not the work level,
 since each translation has its own permalink. The model supports multiple
-parallel sets of canonical links per passage, so additional authoritative
+parallel sets of canonical links per passage so additional authoritative
 sources can be added over time.
 
 ## Data Sourcing
 
-The initial text corpus is English, ingested from the
-[Baha'i Reference Library](https://www.bahai.org/library/) at bahai.org.
-Translations in major world languages (French, Spanish, Russian, Chinese, etc.)
-are a priority but depend on finding structured, authoritative digital sources;
-this is tracked in GitHub Issues.
-
-The work/translation data model is in place from day one so that translations
-can be added incrementally and correlated with existing English passages as
-sources become available.
+The initial corpus is English, ingested from the
+[Baha'i Reference Library](https://www.bahai.org/library/). Translations in
+major world languages are a priority but depend on finding structured,
+authoritative digital sources (tracked in GitHub Issues). The
+work/translation model is in place from day one so translations can be
+correlated with existing English passages as sources become available.
 
 ## Copyright Notice
 
 The Baha'i writings are copyrighted by the Baha'i World Centre and various
-National Spiritual Assemblies. This project provides **access tooling** — the
-API code and infrastructure are open source under Apache 2.0, but the texts
-themselves are used in accordance with the terms of their respective copyright
-holders. This project is not affiliated with or endorsed by the Baha'i World
-Centre.
+National Spiritual Assemblies. This project provides **access tooling** —
+the API code and infrastructure are open source under Apache 2.0, but the
+texts themselves are used in accordance with the terms of their respective
+copyright holders. This project is not affiliated with or endorsed by the
+Baha'i World Centre.
 
 ## Authentication and Cost Transparency
 
-*TBD.* Read-only endpoints (texts, search, passages) may be available without
-authentication. Endpoints that create resources (subscriptions, compilations)
-will require some form of identity.
+Read-only endpoints (texts, search, passages) are intended to be available
+without authentication. Endpoints that create resources (subscriptions,
+compilations) will require identity.
 
-Search — especially semantic/RAG search — has real infrastructure cost. The
+Search — especially semantic/RAG — has real infrastructure cost. The
 intended model is radical transparency: track usage at a granular level and
 surface it honestly to consumers, e.g.:
 
-> "In the last month, you have used $0.55 worth of services. Approximately 2%
-> of users contribute. If you chose to contribute $25/month, you would help
-> maintain full funding of this service."
+> "In the last month, you have used $0.55 worth of services. Approximately
+> 2% of users contribute. If you chose to contribute $25/month, you would
+> help maintain full funding of this service."
 
-This implies lightweight usage tracking even for unauthenticated calls, without
-necessarily requiring strong auth on every request. Design details are TBD.
+This implies lightweight usage tracking even for unauthenticated calls.
+Exact mechanism is open.
 
 ## AI Integration
 
-The primary consumers of this API are AI assistants. The project provides
-multiple integration paths:
+Primary consumers are AI assistants, so the project ships two integration
+paths alongside the REST API:
 
-### OpenAPI Specification
+- **`openapi.yaml`** — generated from FastAPI; usable by any framework that
+  consumes OpenAPI.
+- **MCP server** — a first-class [Model Context Protocol](https://modelcontextprotocol.io/)
+  surface for Claude and other MCP clients, not a thin wrapper.
 
-An `openapi.yaml` file describes every endpoint, parameter, and response
-schema. Agent frameworks (LangChain, CrewAI, OpenAI function calling, etc.)
-can auto-generate tool definitions from this spec.
+Additional agent-discoverability conventions (well-known URLs, registries,
+emerging protocols) are tracked as they stabilize.
 
-### MCP Server
-
-A [Model Context Protocol](https://modelcontextprotocol.io/) server exposes the
-API as native tools for Claude and other MCP-compatible assistants. This is a
-first-class deliverable, not a wrapper.
-
-### Design for Context Windows
-
-- **`fields` parameter** — request only the fields you need to keep responses lean
-- **`highlights`** in search results — agents can present relevant snippets without
-  including full passage text
-- **Batch retrieval** — fetch multiple passages in one call instead of N sequential requests
-- **Pagination** — bounded responses by default
+Responses are designed for context-window efficiency: `fields` trims
+payloads, `highlights` lets agents cite without including full passage
+text, batch passage retrieval replaces N sequential calls, and pagination
+is bounded by default.
 
 ## Development
 
-The project is designed so the full system can be exercised end-to-end in a
-local container environment at any time — not necessarily on every push, but
-on demand. A fast tier of tests runs without containers so that tight
-write-test-iterate loops stay snappy. Tooling is chosen to make AI coding
-agents productive with high autonomy, and humans comfortable too.
+The full system can be exercised end-to-end in a local container
+environment on demand. A fast tier of tests runs without containers so
+tight TDD loops stay snappy. Tooling is chosen to make AI coding agents
+productive with high autonomy.
 
 ### Stack
 
 | Layer | Tool | Why |
 |-------|------|-----|
-| Package / env / Python manager | [`uv`](https://docs.astral.sh/uv/) | Fast, deterministic lockfile; replaces pip, poetry, virtualenv, pyenv |
-| Lint + format | [`ruff`](https://docs.astral.sh/ruff/) | One tool, millisecond feedback, configured in `pyproject.toml` |
-| Type checker | [`pyright`](https://microsoft.github.io/pyright/) | Fast, strict mode, readable errors |
-| Test runner | [`pytest`](https://pytest.org/) | Universal |
-| Task runner | [`just`](https://just.systems/) | Language-agnostic; recipes shared across bahai-api and Immerse Library |
+| Package / env | [`uv`](https://docs.astral.sh/uv/) | Replaces pip + poetry + virtualenv + pyenv |
+| Lint + format | [`ruff`](https://docs.astral.sh/ruff/) | |
+| Type checker | [`pyright`](https://microsoft.github.io/pyright/) | |
+| Test runner | [`pytest`](https://pytest.org/) | |
+| Task runner | [`just`](https://just.systems/) | Recipes shared across bahai-api and Immerse Library |
 | API framework | [`FastAPI`](https://fastapi.tiangolo.com/) + [`pydantic`](https://docs.pydantic.dev/) | Auto-generates OpenAPI from type hints |
-| Scraper | [`httpx`](https://www.python-httpx.org/) + [`vcrpy`](https://vcrpy.readthedocs.io/) | Async HTTP, recorded cassettes for tests |
-| Datastore | SQLite + FTS5 | Embedded, fast, no extra container in dev |
+| Scraper | [`httpx`](https://www.python-httpx.org/) + [`vcrpy`](https://vcrpy.readthedocs.io/) | Recorded cassettes keep scraper tests offline |
+| Datastore | SQLite + FTS5 | Embedded; no extra container in dev |
 
 Configuration lives in `pyproject.toml` alongside a `justfile` and
-`compose.yml`. Pre-commit hooks are deliberately avoided — `just check` runs
-lint + format + typecheck explicitly. Migrations are hand-written numbered
-SQL files rather than Alembic until schema complexity warrants otherwise.
+`compose.yml`. Pre-commit hooks are deliberately avoided — `just check`
+runs lint + format + typecheck explicitly. Migrations are hand-written
+numbered SQL files rather than Alembic until schema complexity warrants
+otherwise.
 
 ### Local Stack
 
-A `compose.yml` brings up the API against a committed fixture database. The
-[Immerse Library](https://immerselibrary.org) repo references the same
+A `compose.yml` brings up the API against a committed fixture database.
+The [Immerse Library](https://immerselibrary.org) repo references the same
 compose setup (or a tagged image) for its own e2e tests, so there is a
 single source of truth for how the API is run locally.
 
 ### Test Tiers
 
-| Tier | Scope | Runtime | When |
-|------|-------|---------|------|
-| **unit** | pure logic, no I/O | ms | every push |
-| **integration** | API process + SQLite against fixture DB, no containers | seconds | every push |
-| **e2e** | full compose stack + Playwright (once the PWA lands) | tens of seconds | on demand |
+| Tier | Scope | Runtime | Command |
+|------|-------|---------|---------|
+| unit | pure logic, no I/O | ms | `just test` |
+| integration | API process + SQLite fixture DB, no containers | seconds | `just test` |
+| e2e | full compose stack + Playwright (once the PWA lands) | tens of seconds | `just e2e` |
 
-- `just test` — unit + integration
-- `just e2e` — full compose stack
-- `just check` — lint + format + typecheck
+`just check` runs lint + format + typecheck.
 
 ### Test Data
 
 Fixtures are **real scraped passages**, not mock data — a small, stable
 slice of the corpus committed to the repo so tests reflect real content
-shape and edge cases without hitting bahai.org. The scraper itself is tested
-against recorded HTTP cassettes.
+shape without hitting bahai.org. The scraper itself is tested against
+recorded HTTP cassettes.
 
 The goal is a fast, deterministic, offline TDD loop that AI coding agents
 can drive on their own. LLM-output evals are planned but out of scope for
@@ -267,7 +256,8 @@ the initial test story.
 ## Contributing
 
 Task tracking uses [GitHub Issues](../../issues). Look for issues labeled
-`good first issue` or `help wanted`.
+`good first issue` or `help wanted`. Agent workflow conventions live in
+[CLAUDE.md](CLAUDE.md).
 
 ## License
 

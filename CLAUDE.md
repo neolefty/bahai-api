@@ -1,0 +1,56 @@
+# Agent Workflow
+
+This project is in early planning. Nothing is built yet; the README
+describes intended shape. Work is sliced into GitHub Issues and picked up
+one ticket at a time.
+
+## Tickets
+
+Treat an issue as the unit of work.
+
+- Read the issue and any linked issues before starting. If scope is
+  unclear, ask on the issue rather than expanding it silently.
+- Reference the issue number in commit messages (`#42`) so GitHub links
+  the work back.
+- Keep the PR scoped to the ticket. Don't bundle drive-by refactors.
+
+**Follow-on tickets.** When you notice adjacent work — a refactor, a
+related bug, a gap in fixtures — weigh it before filing:
+
+- File it if it's concrete, actionable, and someone would pick it up
+  (a clear title, a rough acceptance criterion).
+- Don't file if it's vague ("improve error handling"), speculative
+  ("might want X someday"), or duplicative of an existing issue.
+- If in doubt, mention it on the parent issue rather than creating a
+  new one. The backlog should stay small enough that a human can scan
+  it in one sitting.
+
+## Testing Workflow
+
+TDD is the default loop.
+
+1. Pick the issue.
+2. Write or extend a test that describes the desired behavior, using
+   real committed fixtures (not mocks).
+3. Implement until `just test` passes.
+4. Run `just check` before committing.
+5. Run `just e2e` only if the change touches the full stack. It's
+   on-demand, not every-push.
+
+### Fixtures
+
+- Database and corpus tests run against real scraped passages committed
+  to the repo — use those fixtures directly.
+- Scraper tests replay recorded vcrpy cassettes, so the suite stays
+  offline.
+- When a test needs new fixture data or a new network interaction,
+  capture it from the real source and commit the passage or cassette
+  alongside the test.
+
+## Before declaring a task done
+
+- `just check` is clean.
+- `just test` is green.
+- New behavior has a test that would have failed before the change.
+- The issue's acceptance criteria are met, or any deviation is called
+  out on the issue.
