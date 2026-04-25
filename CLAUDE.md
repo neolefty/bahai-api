@@ -1,7 +1,8 @@
 # Agent Workflow
 
-This project is in early planning. Nothing is built yet; the README
-describes intended shape. Work is sliced into GitHub Issues and picked up
+This project is in early scaffolding. The README describes the intended
+shape; only a small slice (project layout, tooling, the discovery root)
+is implemented so far. Work is sliced into GitHub Issues and picked up
 one ticket at a time.
 
 ## Tickets
@@ -46,6 +47,16 @@ TDD is the default loop.
 - When a test needs new fixture data or a new network interaction,
   capture it from the real source and commit the passage or cassette
   alongside the test.
+
+## Conventions
+
+- HTTP endpoints return typed Pydantic response models, not bare
+  `dict`s. The OpenAPI schema is a primary deliverable — clients,
+  agents, and the MCP surface all rely on it — so response shapes
+  must be discoverable from the schema alone.
+- The wire-protocol version (`API_VERSION` in `src/bahai_api/main.py`)
+  bumps only on breaking changes. Additive changes ship under the
+  current version.
 
 ## Before declaring a task done
 
