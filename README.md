@@ -3,8 +3,9 @@
 Open-source APIs for accessing, searching, and sharing the Baha'i writings.
 Designed for AI assistants, personal agents, and developers.
 
-> **Status:** planning / design. The endpoints below describe the intended
-> API surface; none of it is implemented yet. Work is tracked in
+> **Status:** early scaffolding. The discovery root (`GET /api/v1`) is
+> live and publishes a typed schema; everything else below describes the
+> intended API surface and is not implemented yet. Work is tracked in
 > [GitHub Issues](../../issues).
 
 ## Overview
