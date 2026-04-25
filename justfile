@@ -7,6 +7,11 @@ check:
     uv run ruff format --check .
     uv run pyright
 
+# Apply ruff formatting and lint autofixes.
+fmt:
+    uv run ruff format .
+    uv run ruff check --fix .
+
 # Unit + integration tests (no containers).
 test:
     uv run pytest

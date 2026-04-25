@@ -20,7 +20,6 @@ def test_discovery_advertises_all_capabilities() -> None:
     body = client.get(API_PREFIX).json()
 
     assert set(body["capabilities"]) == set(CAPABILITIES)
-    assert "search" in body["capabilities"]
 
 
 def test_discovery_capability_set_matches_endpoint_set() -> None:

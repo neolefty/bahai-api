@@ -29,7 +29,11 @@ class DiscoveryResponse(BaseModel):
     endpoints: dict[str, str] = Field(description="Map from capability name to its base URL path.")
 
 
-def _build_discovery_response() -> DiscoveryResponse:
+app = FastAPI(title="bahai-api", version=__version__)
+
+
+@app.get(API_PREFIX, response_model=DiscoveryResponse)
+def discovery() -> DiscoveryResponse:
     return DiscoveryResponse(
         name="bahai-api",
         version=__version__,
@@ -37,11 +41,3 @@ def _build_discovery_response() -> DiscoveryResponse:
         capabilities=list(CAPABILITIES),
         endpoints={cap: f"{API_PREFIX}/{cap}" for cap in CAPABILITIES},
     )
-
-
-app = FastAPI(title="bahai-api", version=__version__)
-
-
-@app.get(API_PREFIX, response_model=DiscoveryResponse)
-def discovery() -> DiscoveryResponse:
-    return _build_discovery_response()
