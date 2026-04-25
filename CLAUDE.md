@@ -58,6 +58,15 @@ TDD is the default loop.
   bumps only on breaking changes. Additive changes ship under the
   current version.
 
+## Cost posture
+
+Per-query LLM cost dominates variable spend; operator time dominates
+fixed cost. Don't optimize hosting or infra choices for small dollar
+savings — prefer operational simplicity, agent-friendliness, and
+architectural fit. The README's cost-transparency feature is about
+honest disclosure of per-query LLM cost to users, not about minimizing
+the operator's bill.
+
 ## Before declaring a task done
 
 - `just check` is clean.

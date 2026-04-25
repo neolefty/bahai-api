@@ -171,16 +171,18 @@ Read-only endpoints (texts, search, passages) are intended to be available
 without authentication. Endpoints that create resources (subscriptions,
 compilations) will require identity.
 
-Search — especially semantic/RAG — has real infrastructure cost. The
-intended model is radical transparency: track usage at a granular level and
-surface it honestly to consumers, e.g.:
+Search — especially semantic/RAG — has real **per-query** cost dominated
+by LLM token usage. The intended model is radical transparency: track
+usage at a granular level and surface it honestly to consumers, e.g.:
 
 > "In the last month, you have used $0.55 worth of services. Approximately
 > 2% of users contribute. If you chose to contribute $25/month, you would
 > help maintain full funding of this service."
 
 This implies lightweight usage tracking even for unauthenticated calls.
-Exact mechanism is open.
+The numbers surfaced are variable per-query cost (mostly tokens); fixed
+hosting overhead is small enough to fold in without separate disclosure.
+Exact tracking mechanism is open.
 
 ## AI Integration
 
