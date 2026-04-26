@@ -1,12 +1,10 @@
 from fastapi.testclient import TestClient
 
 from bahai_api import __version__
-from bahai_api.main import API_PREFIX, API_VERSION, CAPABILITIES, app
-
-client = TestClient(app)
+from bahai_api.main import API_PREFIX, API_VERSION, CAPABILITIES
 
 
-def test_discovery_returns_service_identity() -> None:
+def test_discovery_returns_service_identity(client: TestClient) -> None:
     response = client.get(API_PREFIX)
 
     assert response.status_code == 200
@@ -16,13 +14,13 @@ def test_discovery_returns_service_identity() -> None:
     assert body["api_version"] == API_VERSION
 
 
-def test_discovery_advertises_all_capabilities() -> None:
+def test_discovery_advertises_all_capabilities(client: TestClient) -> None:
     body = client.get(API_PREFIX).json()
 
     assert set(body["capabilities"]) == set(CAPABILITIES)
 
 
-def test_discovery_capability_set_matches_endpoint_set() -> None:
+def test_discovery_capability_set_matches_endpoint_set(client: TestClient) -> None:
     body = client.get(API_PREFIX).json()
 
     assert set(body["capabilities"]) == set(body["endpoints"]), (
@@ -30,14 +28,14 @@ def test_discovery_capability_set_matches_endpoint_set() -> None:
     )
 
 
-def test_discovery_endpoint_paths_share_api_prefix() -> None:
+def test_discovery_endpoint_paths_share_api_prefix(client: TestClient) -> None:
     endpoints = client.get(API_PREFIX).json()["endpoints"]
 
     for capability, path in endpoints.items():
         assert path == f"{API_PREFIX}/{capability}"
 
 
-def test_discovery_response_is_published_in_openapi_schema() -> None:
+def test_discovery_response_is_published_in_openapi_schema(client: TestClient) -> None:
     schema = client.get("/openapi.json").json()
 
     assert "DiscoveryResponse" in schema["components"]["schemas"], (

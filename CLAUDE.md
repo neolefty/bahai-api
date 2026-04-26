@@ -57,6 +57,8 @@ TDD is the default loop.
 - The wire-protocol version (`API_VERSION` in `src/bahai_api/main.py`)
   bumps only on breaking changes. Additive changes ship under the
   current version.
+- Tests take the shared `client` fixture from `tests/conftest.py`
+  rather than constructing `TestClient(app)` themselves.
 
 ## Cost posture
 

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
@@ -29,6 +31,17 @@ class DiscoveryResponse(BaseModel):
     endpoints: dict[str, str] = Field(description="Map from capability name to its base URL path.")
 
 
+class HealthResponse(BaseModel):
+    """Liveness probe payload.
+
+    Lives outside `API_PREFIX` so probes are stable across wire-protocol
+    version bumps. Readiness (DB, downstream deps) is a separate concern
+    and will land on `/readyz` once there's something to depend on.
+    """
+
+    status: Literal["ok"] = Field(description="Liveness status. `ok` when the process is up.")
+
+
 app = FastAPI(title="bahai-api", version=__version__)
 
 
@@ -41,3 +54,8 @@ def discovery() -> DiscoveryResponse:
         capabilities=list(CAPABILITIES),
         endpoints={cap: f"{API_PREFIX}/{cap}" for cap in CAPABILITIES},
     )
+
+
+@app.get("/healthz", response_model=HealthResponse)
+def healthz() -> HealthResponse:
+    return HealthResponse(status="ok")
