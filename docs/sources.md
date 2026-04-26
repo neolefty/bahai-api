@@ -17,17 +17,18 @@ Landing page: <https://www.bahai.org/library/>
 
 Each authoritative work has a "single HTML download" page that bundles
 the entire work onto one URL. Fetching the bundle once is the right
-ingestion strategy — per-passage fetches are unnecessary.
-
-| Work | Languages on bahai.org |
-|------|------------------------|
-| Hidden Words | en, fa |
+ingestion strategy — per-passage fetches are unnecessary. The Hidden
+Words is the only work ingested so far, in English and Persian.
 
 The site has a `/fa/` (Persian) parallel tree but **no `/ar/`**:
 `https://www.bahai.org/ar/library/...` 301-redirects back to English.
 Arabic-original text for works whose original language is Arabic
 (e.g. the Arabic Hidden Words) is therefore **not** available from
 this source and would need a different upstream.
+
+`robots.txt` is fully permissive (no `Disallow`, no `Crawl-delay`),
+but use a small self-imposed delay and a `User-Agent` that
+identifies the project.
 
 ### Bundle URL pattern
 
@@ -94,13 +95,3 @@ language" features. It is not enough for verse-level scholarly
 alignment of long works, but Hidden Words is short and stanzaic, so
 ordinal alignment is unambiguous here. Re-evaluate per work as we
 expand the corpus.
-
-### robots.txt
-
-```
-User-agent: *
-Disallow:
-```
-
-No `Crawl-delay`, no `Sitemap`. Be polite anyway with a small
-self-imposed delay and a `User-Agent` that identifies the project.
